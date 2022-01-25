@@ -218,7 +218,8 @@ function broadcast(channels::Union{ChannelName,Vector{ChannelName}},
   isa(channels, Array) || (channels = ChannelName[channels])
 
   for channel in channels
-    haskey(SUBSCRIPTIONS, channel) || throw(ChannelNotFoundException(channel))
+    # haskey(SUBSCRIPTIONS, channel) || throw(ChannelNotFoundException(channel))
+    haskey(SUBSCRIPTIONS, channel) || return false
 
     for client in SUBSCRIPTIONS[channel]
       except !== nothing && client == id(except) && continue

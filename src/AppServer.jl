@@ -290,7 +290,11 @@ Configures the handler for WebSockets requests.
 function setup_ws_handler(req::HTTP.Request, ws_client) :: Nothing
   try
     while ! eof(ws_client)
-      write(ws_client, String(Distributed.@fetch handle_ws_request(req, String(readavailable(ws_client)), ws_client)))
+      response = Distributed.@fetch handle_ws_request(req, String(readavailable(ws_client)), ws_client)
+      if response !== Genie.NO_RESPONSE
+        write(ws_client, String(response))
+      end
+      #write(ws_client, String(Distributed.@fetch handle_ws_request(req, String(readavailable(ws_client)), ws_client)))
     end
   catch ex
     if isa(ex, Distributed.RemoteException) &&

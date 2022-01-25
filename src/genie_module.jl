@@ -69,7 +69,6 @@ This function loads user code into the Genie app.
 """
 function load_libs(root_dir::String = Genie.config.path_lib) :: Nothing
   isdir(root_dir) || return nothing
-
   push!(LOAD_PATH, root_dir)
 
   @async for (root, dirs, files) in walkdir(root_dir)

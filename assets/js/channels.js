@@ -118,7 +118,7 @@ function parse_payload(json_data) {
 };
 
 function subscription_ready() {
-  console.log("Subscription ready");
+  // console.log("Subscription ready");
 };
 
 function subscribe() {
@@ -126,12 +126,12 @@ function subscribe() {
     Genie.WebChannels.sendMessageTo(window.Genie.Settings.webchannels_default_route, window.Genie.Settings.webchannels_subscribe_channel);
     window.subscription_ready();
   } else {
-    console.log("Queuing subscription");
+    //console.log("Queuing subscription");
     setTimeout(subscribe, Genie.Settings.webchannels_timeout);
   }
 };
 
 function unsubscribe() {
   Genie.WebChannels.sendMessageTo(window.Genie.Settings.webchannels_default_route, window.Genie.Settings.webchannels_unsubscribe_channel);
-  console.log("Unsubscription completed");
+  //console.log("Unsubscription completed");
 };

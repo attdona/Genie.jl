@@ -224,6 +224,10 @@ const down = AppServer.down
 const isrunning = AppServer.isrunning
 const down! = AppServer.down!
 
+"""
+Value returned by websocket channel action to avoid response message. 
+"""
+const NO_RESPONSE = ""
 
 ### PRIVATE ###
 

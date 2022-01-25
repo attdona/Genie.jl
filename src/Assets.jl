@@ -5,6 +5,7 @@ module Assets
 
 import Genie, Genie.Configuration, Genie.Router, Genie.WebChannels, Genie.WebThreads
 import Genie.Renderer.Json
+import JSON3
 
 export include_asset, css_asset, js_asset, js_settings, css, js
 export embedded, channels_script, channels_support, webthreads_script, webthreads_support
@@ -213,14 +214,16 @@ function channels_subscribe(channel::AbstractString = Genie.config.webchannels_d
   Router.channel("/$(channel)/$(Genie.config.webchannels_subscribe_channel)") do
     WebChannels.subscribe(Genie.Requests.wsclient(), channel)
 
-    "Subscription: OK"
+    # "Subscription: OK"
+    JSON3.write(Dict("method"=>"subscribed"))
   end
 
   Router.channel("/$(channel)/$(Genie.config.webchannels_unsubscribe_channel)") do
     WebChannels.unsubscribe(Genie.Requests.wsclient(), channel)
     WebChannels.unsubscribe_disconnected_clients()
 
-    "Unsubscription: OK"
+    # "Unsubscription: OK"
+    JSON3.write(Dict("method"=>"unsubscribed"))
   end
 
   nothing

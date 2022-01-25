@@ -22,8 +22,10 @@ function execute(config::Genie.Configuration.Settings; server::Union{Sockets.TCP
   Genie.config.websockets_port = haskey(ENV, "WSPORT") ? parse(Int, ENV["WSPORT"]) : parse(Int, parsed_args["w"])
   Genie.config.server_host = parsed_args["l"]
 
-  if called_command(parsed_args, "s") || (haskey(ENV, "STARTSERVER") && parse(Bool, ENV["STARTSERVER"]))
-    Genie.config.run_as_server = true
+  if parsed_args["s"] == true || (haskey(ENV, "STARTSERVER") && parse(Bool, ENV["STARTSERVER"]))
+    if !isinteractive()
+      Genie.config.run_as_server = true
+    end
     Base.invokelatest(Genie.up, Genie.config.server_port, Genie.config.server_host; server = server)
 
   elseif called_command(parsed_args, "r")
@@ -56,8 +58,9 @@ function parse_commandline_args(config::Genie.Configuration.Settings) :: Dict{St
   settings.epilog = "Visit https://genieframework.com for more info"
 
   ArgParse.@add_arg_table! settings begin
-    "s"
+    "-s"
     help = "starts HTTP server"
+    action = :store_true
 
     "-p"
     help = "HTTP server port"
@@ -70,9 +73,6 @@ function parse_commandline_args(config::Genie.Configuration.Settings) :: Dict{St
     "-l"
     help = "Host IP to listen on"
     default = "$(config.server_host)"
-
-    "si"
-    help = "starts HTTP server and enters REPL"
 
     "-r"
     help = "runs Genie.Toolbox task"
@@ -92,7 +92,7 @@ end
 Checks whether or not a certain command was invoked by looking at the command line args.
 """
 function called_command(args::Dict{String,Any}, key::String) :: Bool
-  haskey(args, key) && (args[key] == "true" || args["s"] == key || args[key] !== nothing)
+  haskey(args, key) && args[key] !== nothing
 end
 
 end

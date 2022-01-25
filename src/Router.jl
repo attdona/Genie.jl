@@ -504,6 +504,8 @@ function handle_exception(ex::Exception)
   rethrow(ex)
 end
 
+to_ws_response(action_result::Nothing) = Genie.NO_RESPONSE
+to_ws_response(action_result::String) = action_result
 
 """
     match_channels(req::Request, msg::String, ws_client::HTTP.WebSockets.WebSocket, params::Params) :: String
@@ -542,10 +544,10 @@ function match_channels(req, msg::String, ws_client, params::Params) :: String
 
     return  try
                 result = try
-                  (c.action)() |> string
+                  (c.action)() |> to_ws_response
                 catch ex1
                   if isa(ex1, MethodError) && string(ex1.f) == string(c.action)
-                    Base.invokelatest(c.action) |> string
+                    Base.invokelatest(c.action) |> to_ws_response
                   else
                     rethrow(ex1)
                   end
