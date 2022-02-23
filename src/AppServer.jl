@@ -7,6 +7,7 @@ using HTTP, Sockets
 import Millboard, Distributed, Logging, MbedTLS
 import Genie
 
+using Caronte
 
 """
     ServersCollection(webserver::Union{Task,Nothing}, websockets::Union{Task,Nothing})
@@ -77,6 +78,9 @@ function startup(port::Int, host::String = Genie.config.server_host;
                   reuseaddr::Bool = false,
                   http_kwargs...) :: ServersCollection
 
+  rt = Caronte.init()
+  @async Caronte.run(rt)
+
   if server !== nothing
     try
       socket_info = Sockets.getsockname(server)
@@ -99,7 +103,7 @@ function startup(port::Int, host::String = Genie.config.server_host;
                                                 sslconfig = ssl_config, reuseaddr = reuseaddr, http_kwargs...) do http::HTTP.Stream
       if HTTP.WebSockets.is_upgrade(http.message)
         HTTP.WebSockets.upgrade(http) do ws
-          setup_ws_handler(http.message, ws)
+          setup_ws_handler(rt, http.message, ws)
         end
       end
     end
@@ -111,7 +115,7 @@ function startup(port::Int, host::String = Genie.config.server_host;
       try
         if Genie.config.websockets_server && port == ws_port && HTTP.WebSockets.is_upgrade(http.message)
           HTTP.WebSockets.upgrade(http) do ws
-            setup_ws_handler(http.message, ws)
+            setup_ws_handler(rt, http.message, ws)
           end
         else
           setup_http_streamer(http)
@@ -307,6 +311,10 @@ function setup_ws_handler(req::HTTP.Request, ws_client) :: Nothing
   nothing
 end
 
+function setup_ws_handler(rt::Caronte.Router, req::HTTP.Request, ws_client) :: Nothing
+      @info "Request: $req"
+      Caronte.anonymous(rt, ws_client)
+end  
 
 """
     handle_ws_request(req::HTTP.Request, msg::String, ws_client) :: String

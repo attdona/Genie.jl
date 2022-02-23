@@ -187,7 +187,7 @@ Base.@kwdef mutable struct Settings
   path_src::String                                    = "src"
 
   webchannels_default_route::String                   = "____"
-  webchannels_js_file::String                         = "channels.js"
+  webchannels_js_file::String                         = "caronte.js"
   webchannels_subscribe_channel::String               = "subscribe"
   webchannels_unsubscribe_channel::String             = "unsubscribe"
   webchannels_autosubscribe::Bool                     = true
