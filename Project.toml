@@ -5,7 +5,6 @@ version = "4.7.1"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
-Caronte = "aa126574-2ec3-42c9-8bf5-7f62001d6bce"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"

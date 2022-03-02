@@ -92,7 +92,7 @@ function load_resources(root_dir::String = Genie.config.path_resources) :: Nothi
 
   push!(LOAD_PATH, root_dir)
 
-  @async for (root, dirs, files) in walkdir(root_dir)
+  for (root, dirs, files) in walkdir(root_dir)
     Threads.@threads for dir in dirs
       p = joinpath(root, dir)
       in(p, LOAD_PATH) || push!(LOAD_PATH, joinpath(root, dir))
@@ -279,25 +279,25 @@ function load(; context::Union{Module,Nothing} = nothing) :: Nothing
 
   load_configurations(context = context)
 
-  replprint("initializers", t, clearline = 0, prefix = "Loading ")
+  #replprint("initializers", t, clearline = 0, prefix = "Loading ")
   load_initializers(context = context)
 
-  replprint("helpers", t, prefix = "Loading ")
+  #replprint("helpers", t, prefix = "Loading ")
   load_helpers()
 
-  replprint("lib", t, prefix = "Loading ")
+  #replprint("lib", t, prefix = "Loading ")
   load_libs()
 
-  replprint("resources", t, prefix = "Loading ")
+  #replprint("resources", t, prefix = "Loading ")
   load_resources()
 
-  replprint("plugins", t, prefix = "Loading ")
+  #replprint("plugins", t, prefix = "Loading ")
   load_plugins(context = context)
 
-  replprint("routes", t, prefix = "Loading ")
+  #replprint("routes", t, prefix = "Loading ")
   load_routes_definitions(context = context)
 
-  replprint("\nReady! \n", t, clearline = 2, color = :green, bold = :true)
+  #replprint("\nReady! \n", t, clearline = 2, color = :green, bold = :true)
   println()
 
   nothing

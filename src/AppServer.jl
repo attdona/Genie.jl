@@ -7,7 +7,7 @@ using HTTP, Sockets
 import Millboard, Distributed, Logging, MbedTLS
 import Genie
 
-using Caronte
+#using Caronte
 
 """
     ServersCollection(webserver::Union{Task,Nothing}, websockets::Union{Task,Nothing})
@@ -78,8 +78,8 @@ function startup(port::Int, host::String = Genie.config.server_host;
                   reuseaddr::Bool = false,
                   http_kwargs...) :: ServersCollection
 
-  rt = Caronte.init()
-  @async Caronte.run(rt)
+#  rt = Caronte.init()
+#  @async Caronte.run(rt)
 
   if server !== nothing
     try
@@ -103,7 +103,8 @@ function startup(port::Int, host::String = Genie.config.server_host;
                                                 sslconfig = ssl_config, reuseaddr = reuseaddr, http_kwargs...) do http::HTTP.Stream
       if HTTP.WebSockets.is_upgrade(http.message)
         HTTP.WebSockets.upgrade(http) do ws
-          setup_ws_handler(rt, http.message, ws)
+          #setup_ws_handler(rt, http.message, ws)
+          setup_ws_handler(http.message, ws)
         end
       end
     end
@@ -115,7 +116,8 @@ function startup(port::Int, host::String = Genie.config.server_host;
       try
         if Genie.config.websockets_server && port == ws_port && HTTP.WebSockets.is_upgrade(http.message)
           HTTP.WebSockets.upgrade(http) do ws
-            setup_ws_handler(rt, http.message, ws)
+            #setup_ws_handler(rt, http.message, ws)
+            setup_ws_handler(http.message, ws)
           end
         else
           setup_http_streamer(http)
@@ -130,7 +132,8 @@ function startup(port::Int, host::String = Genie.config.server_host;
   server_url = "$( (ssl_config !== nothing && Genie.config.ssl_enabled) ? "https" : "http" )://$host:$port"
 
   status = if async
-    print_server_status("Web Server starting at $server_url")
+    #print_server_status("Web Server starting at $server_url")
+    @info "Web Server starting at $server_url"
     @async command()
   else
     print_server_status("Web Server starting at $server_url - press Ctrl/Cmd+C to stop the server.")
@@ -311,10 +314,10 @@ function setup_ws_handler(req::HTTP.Request, ws_client) :: Nothing
   nothing
 end
 
-function setup_ws_handler(rt::Caronte.Router, req::HTTP.Request, ws_client) :: Nothing
-      @info "Request: $req"
-      Caronte.anonymous(rt, ws_client)
-end  
+#function setup_ws_handler(rt::Caronte.Router, req::HTTP.Request, ws_client) :: Nothing
+#      @info "Request: $req"
+#      Caronte.anonymous(rt, ws_client)
+#end  
 
 """
     handle_ws_request(req::HTTP.Request, msg::String, ws_client) :: String
