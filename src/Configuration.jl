@@ -213,6 +213,7 @@ Base.@kwdef mutable struct Settings
   session_key_name::String                            = "__geniesid"
   session_storage::Union{Symbol,Nothing}              = nothing
   session_options::Dict{String,Any}                   = Dict{String,Any}("Path" => "/", "HttpOnly" => true, "Secure" => ssl_enabled)
+  session_ignore_paths::Vector{String}                = String[] # list of path that does not bind to the session
 
   base_path::String                                   = haskey(ENV, "BASEPATH") ? ENV["BASEPATH"] : ""
 

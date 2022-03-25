@@ -5,7 +5,6 @@ import Genie
 
 # const HTTP = HTTP
 
-
 """
     mutable struct Session
 
@@ -98,11 +97,18 @@ function init() :: Nothing
   @eval Genie.config.session_storage == :File && include(joinpath(@__DIR__, "session_adapters", "FileSession.jl"))
 
   push!(Genie.Router.pre_match_hooks, Genie.Sessions.start)
-  push!(Genie.Router.pre_response_hooks, Genie.Sessions.persist)
+  push!(Genie.Router.pre_response_hooks, Genie.Sessions.persist_filtered)
 
   nothing
 end
 
+
+function persist_filtered(req::HTTP.Request, res::HTTP.Response, params::Dict{Symbol,Any})
+	if !(req.target in Genie.config.session_ignore_paths)
+		return Genie.Sessions.persist(req, res, params)
+  	end
+  	req, res, params
+end
 
 """
     start(session_id::String, req::HTTP.Request, res::HTTP.Response; options = Dict{String,String}()) :: Tuple{Session,HTTP.Response}
@@ -118,7 +124,7 @@ Initiates a new HTTP session with the provided `session_id`.
 function start(session_id::String, req::HTTP.Request, res::HTTP.Response;
                 options::Dict{String,Any} = Genie.config.session_options) :: Tuple{Session,HTTP.Response}
   Genie.Cookies.set!(res, Genie.config.session_key_name, session_id, options)
-
+  @info "AD START: $session_id"
   load(session_id), res
 end
 
@@ -133,7 +139,12 @@ Initiates a new default session object, generating a new session id.
 - `res::HTTP.Response`: the response object
 - `options::Dict{String,String}`: extra options for setting the session cookie, such as `Path` and `HttpOnly`
 """
-function start(req::HTTP.Request, res::HTTP.Response, params::Dict{Symbol,Any} = Dict{Symbol,Any}(); options::Dict{String,Any} = Genie.config.session_options) :: Tuple{HTTP.Request,HTTP.Response,Dict{Symbol,Any},Session}
+function start(req::HTTP.Request, res::HTTP.Response, params::Dict{Symbol,Any} = Dict{Symbol,Any}(); options::Dict{String,Any} = Genie.config.session_options) :: Tuple{HTTP.Request,HTTP.Response,Dict{Symbol,Any}}
+  
+  if req.target in Genie.config.session_ignore_paths
+    return req, res, Dict{Symbol, Any}()
+  end
+
   session, res = start(id(req, res), req, res; options = options)
 
   params[Genie.PARAMS_SESSION_KEY]   = session
@@ -151,7 +162,7 @@ function start(req::HTTP.Request, res::HTTP.Response, params::Dict{Symbol,Any} =
                                           end
                                         end
 
-  req, res, params, session
+  req, res, params
 end
 const start! = start
 

@@ -111,17 +111,17 @@ end
 
 
 function Genie.Router.error(error_message::String, ::Type{MIME"application/json"}, ::Val{500}; error_info::String = "") :: HTTP.Response
-  json(Dict("error" => "500 Internal Error - $error_message", "info" => error_info), status = 500)
+  json(Dict("error" => error_message, "code"=> 500, "info" => error_info), status = 500)
 end
 
 
 function Genie.Router.error(error_message::String, ::Type{MIME"application/json"}, ::Val{404}; error_info::String = "") :: HTTP.Response
-  json(Dict("error" => "404 Not Found - $error_message", "info" => error_info), status = 404)
+  json(Dict("error" => error_message, "code"=> 404, "info" => error_info), status = 404)
 end
 
 
 function Genie.Router.error(error_code::Int, error_message::String, ::Type{MIME"application/json"}; error_info::String = "") :: HTTP.Response
-  json(Dict("error" => "$error_code Error - $error_message", "info" => error_info), status = error_code)
+  json(Dict("error" => error_message, "code"=>error_code, "info" => error_info), status = error_code)
 end
 
 end

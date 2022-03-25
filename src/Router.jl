@@ -497,7 +497,7 @@ function handle_exception(ex::Genie.Exceptions.InternalServerException)
 end
 
 function handle_exception(ex::Genie.Exceptions.NotFoundException)
-  error(ex.resource, response_mime(), Val(404))
+  error(ex.resource, response_mime(), Val(404), error_info=ex.info)
 end
 
 function handle_exception(ex::Exception)

@@ -74,7 +74,7 @@ RuntimeException(message::String, info::String, code::Int) = RuntimeException(me
 
 Custom printing of `RuntimeException`
 """
-Base.show(io::IO, ex::RuntimeException) = print(io, "RuntimeException: $(ex.code) - $(ex.info) - $(ex.message)")
+Base.show(io::IO, ex::RuntimeException) = print(io, ex.message)
 
 ###
 
@@ -131,13 +131,17 @@ struct NotFoundException <: Exception
   resource::String
 end
 
+Base.show(io::IO, ex::NotFoundException) = print(io, ex.message)
+
 
 """
     NotFoundException(resource::String)
 
 External constructor allowing to pass the name of the not found resource.
 """
-NotFoundException(resource::String) = NotFoundException("$resource can not be found", "", 404, resource)
+NotFoundException(resource::String) = NotFoundException("not found", "", 404, resource)
+
+NotFoundException(resource::String, info::String) = NotFoundException("$resource can not be found", info, 404, resource)
 
 
 """
